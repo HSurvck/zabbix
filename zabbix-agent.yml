@@ -1,10 +1,12 @@
-- host: 
+- hosts: all 
   tasks: 
+    - name: creat /server/tools
+      file: path=/server/tools state=directory
+    - name: copy zabbix-agent
+      copy: src=zabbix-agent-3.0.9-1.el6.x86_64.rpm dest=/server/tools/
     - name: localinstall zabbix-agent
       command: rpm -ivh /server/tools/zabbix-agent-3.0.9-1.el6.x86_64.rpm
     - name: xiugaipeizhiwenjian
       command: sed -i.ori 's#Server=127.0.0.1#Server=172.16.1.61#' /etc/zabbix/zabbix_agentd.conf
     - name: start zabbix-agent
-      server: name=zabbix-agent state=started enabled=yes
-    - name: 
-      command: echo "/etc/init.d/zabbix-agent start" >> /etc/rc.local 
+      service: name=zabbix-agent state=started enabled=yes

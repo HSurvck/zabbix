@@ -1,6 +1,45 @@
 #!/bin/bash
 
-tar xfP /server/tools/zabbix3.0.9_yum.tar.gz
+\rm -f /root/.ssh/id_dsa*
+
+ssh-keygen -t dsa -f /root/.ssh/id_dsa -P "" -q
+
+yum install libselinux-python -y
+
+yum install ansible -y
+
+for ip in 5 6 7 8 9 31 41 51
+do 
+   sshpass -p123456 ssh-copy-id -i /root/.ssh/id_dsa.pub "-o StrictHostKeyChecking=no root@172.16.1.$ip"
+done
+
+cat >> /etc/ansible/hosts <<EOF
+[lb01]
+172.16.1.5
+
+[lb02]
+172.16.1.6
+
+[nfs]
+172.16.1.31
+
+[backup]
+172.16.1.41
+
+[web0102]
+172.16.1.7
+172.16.1.8
+
+[web03]
+172.16.1.9
+
+[db]
+172.16.1.51
+EOF
+
+ansible all -m ping
+
+tar xfP zabbix3.0.9_yum.tar.gz
 
 yum -y --nogpgcheck -C install httpd \
 mysql-server \
@@ -54,7 +93,6 @@ echo "/etc/init.d/httpd start" >> /etc/rc.local
 
 /etc/init.d/zabbix-server start && \
 echo "/etc/init.d/zabbix-server start" >> /etc/rc.local 
-
 
 cp /usr/share/fonts/wqy-microhei/wqy-microhei.ttc /usr/share/fonts/dejavu/DejaVuSans.ttf
 
