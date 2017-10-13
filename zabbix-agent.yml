@@ -1,4 +1,4 @@
-- hosts: all 
+- hosts: all
   tasks: 
     - name: creat /server/tools
       file: path=/server/tools state=directory
